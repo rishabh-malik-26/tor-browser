@@ -31,3 +31,28 @@ def receive_data(socket_name,port,host):
         except Exception as e:
             logging.info(f'Error Creating Socket:{e}')
             raise
+
+
+
+def send(socket_name:str,port:int,host,message:str):
+    try:
+       socket_name.connect((host, port))
+       logging.info(f'Socket Connected to Host:{host}, Port:{port}')
+
+       try:
+        logging.info(f'message datatype before encoding: {type(message)}')
+
+        encoded_message = message.encode()
+        logging.info(f'Data Type of message after encoding: {type(encoded_message)}')
+
+        msg = socket_name.send(encoded_message)
+        # logging.info(f'message datatype: {type(message)}')
+        logging.info(f"Message sent:{msg}")
+
+       except Exception as e:
+           logging.error(f'Error Sending Message')
+           raise
+
+    except Exception as e:
+        logging.error(f"Error sending message: {e}")
+        raise
