@@ -56,3 +56,12 @@ def send(socket_name:str,port:int,host,message:str):
     except Exception as e:
         logging.error(f"Error sending message: {e}")
         raise
+
+
+def symm_key(filename:str) -> bytes:
+    # Creates Symmetric Keys
+    key = Fernet.generate_key()
+    logging.info(f'Symmetric Key Generated')
+    with open(f"symmetric_keys/{filename}","wb") as f:
+        f.write(key)
+    return key
