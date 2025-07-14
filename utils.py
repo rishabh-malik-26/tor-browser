@@ -73,3 +73,43 @@ def symm_decrypt(key:bytes, encrypted_data):
     decrypted_bytes = fernet.decrypt(encrypted_data)
     # message = json.loads(decrypted_bytes.decode())
     return decrypted_bytes
+
+
+def rsa_encryption(public_key_path:str,symmetric_key:bytes) -> bytes:
+    ## Load Public RSA key
+    if isinstance(symmetric_key, bytes):
+        try:
+            with open(public_key_path,"rb") as f:
+                logging.info(f'Public RSA file opened')
+                public_key = serialization.load_pem_public_key(f.read())
+                logging.info(f'Public key loaded of path{public_key}')
+    
+                if not public_key:
+                    logging.error(f'Public RSA key not found for file: {public_key_path}')
+                
+                else:
+                    logging.info(f'Public RSA key data type: {type(public_key)}')
+
+                    encoded_symmetric_key = symmetric_key.encode()
+
+                    logging.info(f'Symmetric key encoded')
+
+                    ## Encrypt Message/Key with RSA Key
+                    encryped_message = public_key.encrypt(encoded_symmetric_key,padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                                algorithm=hashes.SHA256(),
+                                label=None
+                            ))
+                    
+                    logging.info(f'Encrypted: symmetric encrypted with RSA')
+
+                    decoded_encrypted_message = base64.b64encode(encryped_message).decode()
+                    logging.info(f'Decoded: message encrypted with RSA')
+                    logging.info(f'RSA encrypted symmteric key datatype:{type(decoded_encrypted_message)}')
+                    
+                    return decoded_encrypted_message
+        except FileNotFoundError as f:
+            logging.error(f'Error Opening file:{public_key},error:{f}')
+            raise 
+
+    else:
+        raise ValueError(f'Message is not bytes')
