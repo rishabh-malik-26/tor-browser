@@ -113,3 +113,25 @@ def rsa_encryption(public_key_path:str,symmetric_key:bytes) -> bytes:
 
     else:
         raise ValueError(f'Message is not bytes')
+
+
+
+def symm_encrypt(key, message):
+    fernet = Fernet(key)
+
+    # if not isinstance(message, (dict, list)):
+    #     raise ValueError("Encrypt layer must be dict or list")
+    
+    # message_bytes = json.dumps(message).encode()
+
+    if isinstance(message,(list,dict)):
+        message_bytes = json.dumps(message).encode()
+    elif isinstance(message, str):
+        message_bytes = message.encode()
+    else:
+        message_bytes = message
+
+    logging.info(f"Converted {message} to json:{message_bytes}")
+    # message_bytes = message.encode()
+    return fernet.encrypt(message_bytes)
+
