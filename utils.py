@@ -65,3 +65,11 @@ def symm_key(filename:str) -> bytes:
     with open(f"symmetric_keys/{filename}","wb") as f:
         f.write(key)
     return key
+
+
+
+def symm_decrypt(key:bytes, encrypted_data):
+    fernet = Fernet(key)
+    decrypted_bytes = fernet.decrypt(encrypted_data)
+    # message = json.loads(decrypted_bytes.decode())
+    return decrypted_bytes
