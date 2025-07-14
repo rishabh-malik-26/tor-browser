@@ -135,3 +135,62 @@ def symm_encrypt(key, message):
     # message_bytes = message.encode()
     return fernet.encrypt(message_bytes)
 
+
+def onion(onion_message:str) -> json:
+
+    logging.info(f'Message Data Type: {type(onion_message)}')
+
+    if isinstance(onion_message,str):
+
+    # ## Load Symmetric Keys
+        key_1 = load_symm_key(filepath='symmetric_keys\key_1')
+        logging.info(f"Key 1{key_1} loaded")
+        logging.info(f" Key 1 data type {type(key_1)}")
+
+
+        key_2 = load_symm_key(filepath='symmetric_keys\key_2')
+        logging.info(f"Key 2{key_2} Loaded")
+        logging.info(f" Key 2 data type {type(key_2)}")
+
+
+        key_3 = load_symm_key(filepath='symmetric_keys\key_3')
+        logging.info(f"Key 3{key_3} Loaded")
+        logging.info(f" Key 3 data type {type(key_3)}")
+
+
+        ## Encrypts symmentic keys with Assymetric (RSA) keys
+        rsa_encrypted_key_1 = rsa_encryption(public_key_path=r"relay_keys\relay_1_publickey.pem", symmetric_key=key_1)
+        logging.info(f'1st symmetric key crypted by RSA:{type(rsa_encrypted_key_1)}')
+        logging.info(f"RSA 1 key data type: {type(rsa_encrypted_key_1)}")
+
+        rsa_encrypted_key_2 = rsa_encryption(public_key_path=r"relay_keys\relay_2_publickey.pem", symmetric_key=key_2)
+        logging.info(f'2nd symmetric key crypted by RSA')
+        logging.info(f"RSA 2 key data type: {type(rsa_encrypted_key_2)}")
+
+        rsa_encrypted_key_3 = rsa_encryption(public_key_path=r"relay_keys\relay_3_publickey.pem", symmetric_key=key_3)
+        logging.info(f'3rd symmetric key crypted by RSA')
+        logging.info(f"RSA 3 key data type: {type(rsa_encrypted_key_3)}")
+
+        inner_layer = {"encrypted_key":rsa_encrypted_key_3,"message":base64.b64encode(symm_encrypt(key=key_3,message=onion_message)).decode()}
+        logging.info(f"Inner Layer message:{symm_encrypt(key=key_3,message=onion_message)}")
+        logging.info(f"Inner Layer Data type: {type(inner_layer)}")
+
+        middle_layer =  {"encrypted_key":rsa_encrypted_key_2,"message":base64.b64encode(symm_encrypt(key=key_2,message=inner_layer)).decode()}
+        logging.info(f"Middle Layer message:{symm_encrypt(key=key_2,message=inner_layer)}")
+        logging.info(f"Middle Layer Data type: {type(middle_layer)}")
+
+        outer_layer = {"encrypted_key":rsa_encrypted_key_1,"message":base64.b64encode(symm_encrypt(key=key_1,message=middle_layer)).decode()}
+        logging.info(f"Outer Layer Message {symm_encrypt(key=key_1,message=inner_layer)}")
+        logging.info(f"Outer Layer Data type: {type(outer_layer)}")
+
+        json_output = json.dumps(outer_layer)
+        logging.info(f' Outer Layer Converted to json:{json_output}')
+        logging.info(f"Final Output Layer Datatype: {type(json_output)}")
+
+        return json_output
+    
+    else:
+        raise ValueError('Message is not a valid data type, It should be string')
+
+
+
