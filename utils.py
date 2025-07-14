@@ -192,5 +192,25 @@ def onion(onion_message:str) -> json:
     else:
         raise ValueError('Message is not a valid data type, It should be string')
 
+def load_symm_key(filepath:str) -> bytes:
+    """Loads Symmetric keys from their file path"""
+
+    if isinstance(filepath,str):
+        try:
+            with open( filepath,"rb") as f:
+                    logging.info(f'Symmetric key File opened: {filepath}')
+                    key= f.read()
+                    if not key:
+                        logging.warning(f"Symmetric key file {filepath} is empty.")
+                    else:
+                        logging.info(f'Symmetric key read')
+                        logging.info(f'Key data type: {type(key)}')
+                        return key
+                    
+        except FileNotFoundError as e:
+            logging.error(f'Error Opening {filepath}:{e}')
+            raise
+    else:
+        raise ValueError(f"Filepath is not a valid datatype")
 
 
