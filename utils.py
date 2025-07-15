@@ -214,3 +214,13 @@ def load_symm_key(filepath:str) -> bytes:
         raise ValueError(f"Filepath is not a valid datatype")
 
 
+def get_message(message):
+    """ Extracts message to be decrypted
+        Message can be string and bytes """
+    if isinstance(message,str):
+        loaded_message  =  json.loads(message)
+    elif isinstance (message,bytes):
+        json_str = message.decode('utf-8')
+        loaded_message = json.loads(json_str)
+    enc_message = loaded_message['message']
+    return enc_message
