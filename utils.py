@@ -224,3 +224,36 @@ def get_message(message):
         loaded_message = json.loads(json_str)
     enc_message = loaded_message['message']
     return enc_message
+
+
+
+def decrypt_rsa(private_key_path:str,enc_message:bytes)->bytes:
+
+    # if isinstance(enc_message,bytes):
+
+        logging.info(f'Encoded Message datatype:{type(enc_message)}')
+
+        # try:
+        loaded_message = json.loads(enc_message)
+        logging.info(f'Encoded Message Json unwrapped')
+        logging.info(f'Actual Encoded Message Datatype:{type(loaded_message)}')
+
+    
+        key_to_be_broken = base64.b64decode(loaded_message['encrypted_key'])
+        logging.info(f'Datatype of key_to_be_broken: {type(key_to_be_broken)}')
+
+        with open(private_key_path,"rb") as f:
+            private_key = serialization.load_pem_private_key(f.read(),password=b'mypassword')
+
+        plaintext = private_key.decrypt(
+        key_to_be_broken,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+        )
+        logging.info(f'Datatype of plaintext: {type(plaintext)}')
+        return plaintext
+    # else:
+    #     raise ValueError(f"Encoded Message is not string")
