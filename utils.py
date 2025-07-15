@@ -257,3 +257,22 @@ def decrypt_rsa(private_key_path:str,enc_message:bytes)->bytes:
         return plaintext
     # else:
     #     raise ValueError(f"Encoded Message is not string")
+
+
+def decrypt_fernet_key(key:bytes,message:bytes):
+    """D ecryptes message with the Fernet Key"""
+
+    if isinstance(message, str):
+        # message = message.encode("utf-8")
+        message_bytes = base64.b64decode(message)  
+
+    try:
+        f = Fernet(key)
+        logging.info(f"Fernet Loaded: {f}")
+        logging.info(f"Message to be decrypted:{message_bytes}")
+        decrypted_message = f.decrypt(message_bytes) 
+        logging.info(f"Message decrypted:{decrypted_message}")
+        return decrypted_message
+    except Exception as e:
+        logging.error(f"Error Loading fernet:{e}")
+        raise
